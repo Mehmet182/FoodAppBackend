@@ -120,8 +120,8 @@ async def detect(file: UploadFile = File(...)):
             image = image.resize(new_size, Image.Resampling.LANCZOS)
             print(f"📐 Görüntü küçültüldü: {new_size}")
         
-        # YOLO inference - threshold 0.80
-        results = model.predict(source=image, conf=0.80, verbose=False)
+        # YOLO inference - threshold 0.70
+        results = model.predict(source=image, conf=0.70, verbose=False)
         
         detections = []
         
