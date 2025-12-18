@@ -102,11 +102,23 @@ async def detect(file: UploadFile = File(...)):
     try:
         # Görüntüyü oku
         contents = await file.read()
+        
+        # PIL decompression bomb limitini kaldır
+        Image.MAX_IMAGE_PIXELS = None
+        
         image = Image.open(io.BytesIO(contents))
         
         # RGB'ye çevir
         if image.mode != "RGB":
             image = image.convert("RGB")
+        
+        # Büyük görüntüleri küçült (max 1280px)
+        max_size = 1280
+        if image.width > max_size or image.height > max_size:
+            ratio = min(max_size / image.width, max_size / image.height)
+            new_size = (int(image.width * ratio), int(image.height * ratio))
+            image = image.resize(new_size, Image.Resampling.LANCZOS)
+            print(f"📐 Görüntü küçültüldü: {new_size}")
         
         # YOLO inference - threshold 0.80
         results = model.predict(source=image, conf=0.80, verbose=False)
