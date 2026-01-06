@@ -73,7 +73,25 @@ CLASS_CALORIES = {
 async def load_model():
     global model, class_names
     try:
-        model = YOLO("model/best.pt")
+        import sys
+        import os
+        
+        # Model yolunu belirle
+        if getattr(sys, 'frozen', False):
+            # Exe olarak çalışıyor - model exe'nin yanında olmalı
+            base_dir = os.path.dirname(sys.executable)
+            model_path = os.path.join(base_dir, "best.pt")
+        else:
+            # Script olarak çalışıyor
+            # Önce shared altındakini dene
+            model_path = "../shared/model/best.pt"
+            if not os.path.exists(model_path):
+                # Bulamazsa current dir dene
+                model_path = "best.pt"
+            
+        print(f"📂 Model yolu: {model_path}")
+        
+        model = YOLO(model_path)
         class_names = model.names
         
         print("✅ YOLO model yüklendi")
